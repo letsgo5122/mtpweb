@@ -1,0 +1,148 @@
+[gd_scene load_steps=6 format=3 uid="uid://dbdmrdvtk8sxr"]
+
+[ext_resource type="Script" path="res://Mtprtc/Svr.gd" id="2_aad1o"]
+[ext_resource type="Texture2D" uid="uid://crgbmyja74fgo" path="res://texture/background4.png" id="2_it1lm"]
+[ext_resource type="Texture2D" uid="uid://bk5i5c0imext6" path="res://texture/card_back_128.png" id="3_f0imu"]
+[ext_resource type="Script" path="res://Mtprtc/Cli.gd" id="3_hfn3p"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_upd1x"]
+
+[node name="Net" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="base" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_it1lm")
+
+[node name="floor" type="StaticBody2D" parent="base"]
+position = Vector2(520, 564)
+scale = Vector2(60, 2)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="base/floor"]
+shape = SubResource("RectangleShape2D_upd1x")
+
+[node name="MenuBg" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(300, 400)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -200.0
+offset_right = 150.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_f0imu")
+expand_mode = 1
+
+[node name="Svr" type="Node" parent="MenuBg"]
+script = ExtResource("2_aad1o")
+
+[node name="Cli" type="Node" parent="MenuBg"]
+script = ExtResource("3_hfn3p")
+
+[node name="NameTg" type="Label" parent="MenuBg"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 77.0
+offset_bottom = 56.0
+text = "Name"
+
+[node name="Name" type="TextEdit" parent="MenuBg"]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 24.0
+offset_right = 276.0
+offset_bottom = 64.0
+theme_override_font_sizes/font_size = 20
+text = "ZYX"
+
+[node name="RoomNumTg" type="Label" parent="MenuBg"]
+layout_mode = 0
+offset_left = 33.0
+offset_top = 136.0
+offset_right = 121.0
+offset_bottom = 162.0
+text = "Room Num"
+
+[node name="RoomNum" type="TextEdit" parent="MenuBg"]
+layout_mode = 0
+offset_left = 132.0
+offset_top = 130.0
+offset_right = 279.0
+offset_bottom = 166.0
+theme_override_font_sizes/font_size = 20
+
+[node name="Host" type="Button" parent="MenuBg"]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 71.0
+offset_right = 84.0
+offset_bottom = 111.0
+theme_override_font_sizes/font_size = 20
+text = "Host"
+
+[node name="ConnectHost" type="Button" parent="MenuBg"]
+custom_minimum_size = Vector2(60, 40)
+layout_mode = 0
+offset_left = 136.0
+offset_top = 71.0
+offset_right = 274.0
+offset_bottom = 111.0
+theme_override_font_sizes/font_size = 20
+text = "Connect Host"
+
+[node name="Msg" type="RichTextLabel" parent="MenuBg"]
+layout_mode = 0
+offset_left = 43.0
+offset_top = 230.0
+offset_right = 265.0
+offset_bottom = 317.0
+scroll_following = true
+
+[node name="Room" type="Button" parent="MenuBg"]
+layout_mode = 0
+offset_left = 31.0
+offset_top = 182.0
+offset_right = 145.0
+offset_bottom = 218.0
+theme_override_font_sizes/font_size = 20
+text = "New Room"
+
+[node name="Join Room" type="Button" parent="MenuBg"]
+layout_mode = 0
+offset_left = 166.0
+offset_top = 182.0
+offset_right = 273.0
+offset_bottom = 218.0
+theme_override_font_sizes/font_size = 20
+text = "Join Room"
+
+[node name="Start Game" type="Button" parent="MenuBg"]
+layout_mode = 0
+offset_left = 34.0
+offset_top = 350.0
+offset_right = 151.0
+offset_bottom = 386.0
+theme_override_font_sizes/font_size = 20
+text = "Start Game"
+
+[connection signal="pressed" from="MenuBg/Host" to="MenuBg/Svr" method="_on_host_pressed"]
+[connection signal="button_down" from="MenuBg/ConnectHost" to="MenuBg/Cli" method="_on_connect_host_button_down"]
+[connection signal="button_down" from="MenuBg/Room" to="MenuBg/Cli" method="_on_room_button_down"]
+[connection signal="button_down" from="MenuBg/Join Room" to="MenuBg/Cli" method="_on_join_room_button_down"]
+[connection signal="button_down" from="MenuBg/Start Game" to="MenuBg/Cli" method="_on_start_game_button_down"]

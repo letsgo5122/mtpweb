@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3 uid="uid://betk0gx4qvt7v"]
+
+[ext_resource type="Script" path="res://Mtprtc/P_Hero.gd" id="1_n8il5"]
+[ext_resource type="Texture2D" uid="uid://cnw86gkjchvt5" path="res://icon.svg" id="2_tnq1u"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f4vq3"]
+size = Vector2(111, 114)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qjsxm"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/sync = true
+properties/0/watch = false
+
+[node name="P_Hero" type="CharacterBody2D"]
+script = ExtResource("1_n8il5")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(5, 2)
+texture = ExtResource("2_tnq1u")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(4.5, 1)
+shape = SubResource("RectangleShape2D_f4vq3")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_qjsxm")
