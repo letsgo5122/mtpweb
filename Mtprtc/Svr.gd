@@ -122,7 +122,7 @@ func _process(_delta):
 				"hostId" : new_hostId,
 				"players" : Players_array
 				}
-			$"../RoomNum".text = roomNum
+			
 			print("Rooms:",Rooms)
 			var data = {
 				"id" : new_hostId,

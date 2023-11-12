@@ -56,22 +56,8 @@ func RTCPeerDisconnected(id):
 				tween.tween_property(pl_leave, "modulate", Color.DEEP_PINK, 1)
 				tween.tween_property(pl_leave, "scale", Vector2(), 1)
 				tween.tween_callback(pl_leave.queue_free)
-				#$".".get_node(str(pl)).free()
+				
 
-
-#func _on_ws_connected(id):
-#	var Data = {
-#		"id":id,
-#		"msg":Msg.ID
-#		}
-#	Send_One(Data)
-#	#Send back to connected user id  
-#
-#func _on_ws_disconnected(id):
-#	#Players.remove_at(Players.find(str(id)))
-#	print("wsCli:",Players,"Remove %d" % id)
-#	Players.remove_at(Players.find(id))
-#	print("wsCli:",Players)
 func ServerStart():
 	_on_host_pressed()
 	
@@ -130,7 +116,7 @@ func _process(_delta):
 			
 		# Form wsServer send back ROOM_NUM to Creator ,display on host's app 
 		if dataPack.msg == Msg.ROOM_NUM:
-			if dataPack.has("roomNum") and User_Info.id != 1:
+			if dataPack.has("roomNum") and User_Info.id != 1 :
 				$"../RoomNum".text = dataPack.roomNum
 				hostId = dataPack.hostId
 				User_Info["hostId"] = hostId
