@@ -22,16 +22,16 @@ var buffer =""
 var hostId = 0
 var Users = {} #connected websocket
 var User_Info = {}
-var Players = [] #join room players
+var Players  #join room players
 var Rooms = {}
 var rndRoom = "23456789abcdefghjkmnprstuvwxyz"
-
+var tween
 var rtcPeer = WebRTCMultiplayerPeer.new()
 
 @onready var args = Array(OS.get_cmdline_args())
 func _ready():
-	wsPeer.connect("peer_connected",_on_ws_connected)
-	wsPeer.connect("peer_disconnected",_on_ws_disconnected)
+#	wsPeer.connect("peer_connected",_on_ws_connected)
+#	wsPeer.connect("peer_disconnected",_on_ws_disconnected)
 	
 	multiplayer.connected_to_server.connect(RTCServerConnected)
 	multiplayer.peer_connected.connect(RTCPeerConnected)
@@ -40,11 +40,38 @@ func _ready():
 func RTCServerConnected():
 	print("RTC server connected")
 func RTCPeerConnected(id):
-	print("rtc peer connected " + str(id))
+	#print("client:RTCPeerConnected: " + str(id))
+	pass
 	#wsPeer.close()
 func RTCPeerDisconnected(id):
-	print("rtc peer disconnected " + str(id))
-	
+	print("client :RTCPeerDisconnected ",id)
+	for pl in Players:
+		if pl == id:
+			#print("I Can't not erase id,so erase pl instead ",pl)
+			Players.erase(pl)
+			#print("client:RTCPeerDisconnected"," Players",Players," Im ",User_Info.id)
+			if $".".has_node(str(pl)):
+				var pl_leave = $".".get_node(str(pl))
+				tween = get_tree().create_tween()
+				tween.tween_property(pl_leave, "modulate", Color.DEEP_PINK, 1)
+				tween.tween_property(pl_leave, "scale", Vector2(), 1)
+				tween.tween_callback(pl_leave.queue_free)
+				#$".".get_node(str(pl)).free()
+
+
+#func _on_ws_connected(id):
+#	var Data = {
+#		"id":id,
+#		"msg":Msg.ID
+#		}
+#	Send_One(Data)
+#	#Send back to connected user id  
+#
+#func _on_ws_disconnected(id):
+#	#Players.remove_at(Players.find(str(id)))
+#	print("wsCli:",Players,"Remove %d" % id)
+#	Players.remove_at(Players.find(id))
+#	print("wsCli:",Players)
 func ServerStart():
 	_on_host_pressed()
 	
@@ -204,15 +231,8 @@ func generate_room_number():
 	return num
 
 #Server send back to connected user id 
-func _on_ws_connected(id):
-	#print("connected id:",id)
-	var Data = {
-		"id":id,
-		"msg":Msg.ID
-		}
-	Send_One(Data)
-	#Send back to connected user id  
 
+	
 func Send_All(data):
 	wsPeer.put_packet(JSON.stringify(data).to_utf8_buffer())
 	
@@ -222,9 +242,6 @@ func Send_One(data):
 func sendHost(data):
 	wsPeer.get_peer(1).put_packet(JSON.stringify(data).to_utf8_buffer())
 	
-func _on_ws_disconnected(id):
-	pass
-
 
 func _on_room_button_down():
 	$"../Room".visible = false

@@ -22,7 +22,7 @@ var buffer =""
 var hostId = 0
 var Peers = [] #connected websocket
 var User_Info = {}
-var Players = [] #join room players
+var Players =[] #join room players
 var Rooms = {}
 var rndRoom = "abc23def45stghjkuv67mnp89rwxyz"
 var rtcPeer = WebRTCMultiplayerPeer.new()
@@ -43,12 +43,36 @@ func _ready():
 	multiplayer.peer_disconnected.connect(RTCPeerDisconnected)
 	
 func RTCServerConnected():
-	print("RTC server connected")
+	print("RTC server server server server server connected")
 func RTCPeerConnected(id):
-	print("rtc peer connected " + str(id))
+	print("server:RTCPeerConnected:",rtcPeer.get_peers())
+	print("server:RTCPeerConnected: " + str(id))
 	#wsPeer.close()
 func RTCPeerDisconnected(id):
-	print("rtc peer disconnected " + str(id))
+	print("server: rtc peer disconnected: " , str(id))
+	print("server: rtc peer disconnected: Rooms.key",Rooms.keys())
+	for ro in Rooms.keys():
+		for pl in Rooms[ro]["players"]:
+			print(ro," ",pl)
+			if id==pl:
+				Rooms[ro]["players"].erase(id)
+	
+#Server send back to connected user id 
+func _on_ws_connected(id):
+	Peers.append(id)
+	
+	var Data = {
+		"id":id,
+		"msg":Msg.ID
+		}
+	Send_One(Data)
+	#Send back to connected user id  
+	
+func _on_ws_disconnected(id):
+	print("WsSvr:",Peers,"Remove %d" % id)
+	Peers.erase(id)
+	print("WsSvr:",Peers)
+	
 	
 func ServerStart():
 	_on_host_pressed()
@@ -88,18 +112,15 @@ func _process(_delta):
 	while wsPeer.get_available_packet_count():
 		buffer = wsPeer.get_packet().get_string_from_utf8()
 		var dataPack = JSON.parse_string(buffer)
-			
-			
-		# Host Side  Host Side  Host Side  Host Side  Host Side  Host Side  Host Side 
-		# Host Side  Host Side  Host Side  Host Side  Host Side  Host Side  Host Side 
+		
 		if dataPack.msg == Msg.NEW_ROOM:
 			var new_hostId = dataPack.id
-			var Players = []
-			Players.append(new_hostId)
+			var Players_array = []
+			Players_array.append(new_hostId)
 			var roomNum  = generate_room_number()
 			Rooms[roomNum] = {
 				"hostId" : new_hostId,
-				"players" : Players
+				"players" : Players_array
 				}
 			$"../RoomNum".text = roomNum
 			print("Rooms:",Rooms)
@@ -108,12 +129,13 @@ func _process(_delta):
 				"msg" : Msg.ROOM_NUM,
 				"roomNum" : roomNum,
 				"hostId" : Rooms[roomNum]["hostId"],
-				"players" : Players
+				"players" : Players_array
 			}
 			#send New room num back to creater
 			Send_One(data)
 		
 		if dataPack.msg == Msg.JOIN:
+			
 			var roomNum = dataPack.roomNum
 			if Rooms.has(roomNum):#Check Svr Rooms
 				Rooms[roomNum]["players"].append(dataPack.id)
@@ -161,16 +183,6 @@ func generate_room_number():
 		num += rndRoom[index]
 	return num
 
-#Server send back to connected user id 
-func _on_ws_connected(id):
-	Peers.append(id)
-	
-	var Data = {
-		"id":id,
-		"msg":Msg.ID
-		}
-	Send_One(Data)
-	#Send back to connected user id  
 
 func Send_All(data):
 	wsPeer.put_packet(JSON.stringify(data).to_utf8_buffer())
@@ -180,9 +192,6 @@ func Send_One(data):
 	
 func sendHost(data):
 	wsPeer.get_peer(1).put_packet(JSON.stringify(data).to_utf8_buffer())
-	
-func _on_ws_disconnected(id):
-	pass
 
 
 func _on_room_button_down():
@@ -208,17 +217,3 @@ func _on_join_room_button_down():
 		$"../Msg".newline()
 		sendHost(data)
 
-
-func _on_start_game_button_down():
-	Game.rpc()
-@rpc("any_peer", "call_local")
-func Game():
-	$MenuBg.visible = false
-	for i in Players:
-		var p_hero = load("res://Mtprtc/p_hero.tscn")
-		var hero = p_hero.instantiate()
-		hero.name = str(i)
-		add_child(hero)
-		var rnd_x = randi_range(10,20)
-		hero.global_position = Vector2(500+rnd_x,200)
-		
