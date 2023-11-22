@@ -1,0 +1,48 @@
+[gd_scene load_steps=3 format=3 uid="uid://cb40vohnex6v0"]
+
+[ext_resource type="PackedScene" uid="uid://cm5a4xg0yjvnt" path="res://Mancala/bowl.tscn" id="1_w7h86"]
+[ext_resource type="PackedScene" uid="uid://vounogk3mxj2" path="res://Mancala/depot.tscn" id="2_4i8lt"]
+
+[node name="Board" type="Node3D"]
+
+[node name="B1" parent="." instance=ExtResource("1_w7h86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 1)
+
+[node name="B2" parent="." instance=ExtResource("1_w7h86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 1)
+
+[node name="B3" parent="." instance=ExtResource("1_w7h86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 1)
+
+[node name="B4" parent="." instance=ExtResource("1_w7h86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1)
+
+[node name="B5" parent="." instance=ExtResource("1_w7h86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 1)
+
+[node name="B6" parent="." instance=ExtResource("1_w7h86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 1)
+
+[node name="Depot_b" parent="." instance=ExtResource("2_4i8lt")]
+transform = Transform3D(-8.74228e-08, 0, 1, 0, 1, 0, -2, 0, -4.37114e-08, 7, 0, 0)
+
+[node name="R1" parent="." instance=ExtResource("1_w7h86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -1)
+
+[node name="R2" parent="." instance=ExtResource("1_w7h86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -1)
+
+[node name="R3" parent="." instance=ExtResource("1_w7h86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
+
+[node name="R4" parent="." instance=ExtResource("1_w7h86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -1)
+
+[node name="R5" parent="." instance=ExtResource("1_w7h86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -1)
+
+[node name="R6" parent="." instance=ExtResource("1_w7h86")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -1)
+
+[node name="Depot_r" parent="." instance=ExtResource("2_4i8lt")]
+transform = Transform3D(-8.74228e-08, 0, 1, 0, 1, 0, -2, 0, -4.37114e-08, -7, 0, 0)

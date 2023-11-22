@@ -1,0 +1,73 @@
+[gd_scene load_steps=3 format=3 uid="uid://c311gfmtdbubc"]
+
+[ext_resource type="Texture2D" uid="uid://crgbmyja74fgo" path="res://texture/background4.png" id="1_6ijpu"]
+[ext_resource type="Script" path="res://Mancala/game_menu.gd" id="1_ohjxo"]
+
+[node name="GameMenu" type="CanvasLayer"]
+script = ExtResource("1_ohjxo")
+
+[node name="bg" type="TextureRect" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -106.0
+offset_top = -137.5
+offset_right = 106.0
+offset_bottom = 137.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_6ijpu")
+
+[node name="VB" type="VBoxContainer" parent="bg"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="CheckButton" type="CheckButton" parent="bg/VB"]
+layout_mode = 2
+text = "Limit Seconds"
+
+[node name="LimitTimeSec" type="LineEdit" parent="bg/VB"]
+layout_mode = 2
+text = "20"
+alignment = 1
+
+[node name="Label" type="Label" parent="bg/VB"]
+layout_mode = 2
+text = "First Player"
+horizontal_alignment = 1
+
+[node name="First Player" type="OptionButton" parent="bg/VB"]
+layout_mode = 2
+item_count = 2
+selected = 0
+popup/item_0/text = "Blue"
+popup/item_0/id = 0
+popup/item_1/text = "Red"
+popup/item_1/id = 1
+
+[node name="Play" type="Button" parent="bg/VB"]
+layout_mode = 2
+text = "Play"
+
+[node name="Quit" type="Button" parent="bg/VB"]
+layout_mode = 2
+text = "Quit"
+
+[connection signal="toggled" from="bg/VB/CheckButton" to="." method="_on_check_button_toggled"]
+[connection signal="text_changed" from="bg/VB/LimitTimeSec" to="." method="_on_limit_time_sec_text_changed"]
+[connection signal="item_selected" from="bg/VB/First Player" to="." method="_on_first_player_item_selected"]
+[connection signal="pressed" from="bg/VB/Play" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="bg/VB/Quit" to="." method="_on_quit_pressed"]

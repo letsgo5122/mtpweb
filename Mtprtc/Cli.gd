@@ -15,6 +15,7 @@ enum Msg{
 		ANSWER,
 		OFFER,
 		CANDIDATE,
+		START_GAME,
 		TEST
 	}
 var wsPeer := WebSocketMultiplayerPeer.new()
@@ -22,7 +23,7 @@ var buffer =""
 var hostId = 0
 var Users = {} #connected websocket
 var User_Info = {}
-var Players  #join room players
+var Players =[] #join room players
 var Rooms = {}
 var rndRoom = "23456789abcdefghjkmnprstuvwxyz"
 var tween
@@ -30,6 +31,7 @@ var rtcPeer = WebRTCMultiplayerPeer.new()
 
 @onready var args = Array(OS.get_cmdline_args())
 func _ready():
+	$"../Start Game".visible = false
 #	wsPeer.connect("peer_connected",_on_ws_connected)
 #	wsPeer.connect("peer_disconnected",_on_ws_disconnected)
 	
@@ -40,11 +42,13 @@ func _ready():
 func RTCServerConnected():
 	print("RTC server connected")
 func RTCPeerConnected(id):
+	$"../Start Game".visible = true
+	#print("client:RTCPeerConnected",rtcPeer.get_peers())
 	#print("client:RTCPeerConnected: " + str(id))
 	pass
 	#wsPeer.close()
 func RTCPeerDisconnected(id):
-	print("client :RTCPeerDisconnected ",id)
+	#print("client :RTCPeerDisconnected ",id)
 	for pl in Players:
 		if pl == id:
 			#print("I Can't not erase id,so erase pl instead ",pl)
@@ -103,6 +107,8 @@ func _process(_delta):
 				return
 			if ! dataPack.has("roomNum"):
 				User_Info["id"] = dataPack.id
+				Players.append(dataPack.id)
+				GameManager.Players.append(dataPack.id)
 				#For webrtc 
 				rtc_CreateMesh(User_Info["id"])
 			#If user joined room
@@ -111,28 +117,31 @@ func _process(_delta):
 				User_Info["hostId"] = hostId
 				User_Info["roomNum"] = dataPack.roomNum
 				
-			print("Msg.ID User_info: ",User_Info," hostId:",hostId)
-			$"../Msg".add_text("Msg."+ Msg.keys()[Msg.ID]+" "+str(dataPack.id))
+			#print("Msg.ID User_info: ",User_Info," hostId:",hostId)
+			#$"../Msg".add_text("Msg."+ Msg.keys()[Msg.ID]+" "+str(dataPack.id))
+			$"../Msg".add_text("ID: "+str(dataPack.id))
+			$"../Msg".newline()
 			
 		# Form wsServer send back ROOM_NUM to Creator ,display on host's app 
 		if dataPack.msg == Msg.ROOM_NUM:
-			if dataPack.has("roomNum") and User_Info.id != 1 :
+			#if dataPack.has("roomNum") and User_Info.id != 1 :
 				$"../RoomNum".text = dataPack.roomNum
 				hostId = dataPack.hostId
 				User_Info["hostId"] = hostId
 				User_Info["roomNum"] = dataPack.roomNum
-			print("Msg.ROOM_NUM User_info: ",User_Info," hostId:",hostId)
+				#print("Msg.ROOM_NUM User_info: ",User_Info," hostId:",hostId)
 	
-		
 		if dataPack.msg == Msg.MATCH:
-			if User_Info.id != 1 :
+			#if User_Info.id != 1 :
 				Players = dataPack.players
-				print("Msg.MATCH Players ",dataPack.id," myId: ",User_Info.id)
+				GameManager.Players = Players
+				#print("Msg.MATCH Players ",dataPack.id," myId: ",User_Info.id)
 				create_Rtc_Peer(dataPack.id)
+				broadcast.rpc("Mach: "+str(dataPack.id))
 			
 		if dataPack.msg == Msg.CANDIDATE:
 			if rtcPeer.has_peer(dataPack.orgPeer):
-				print("Got Candididate: " + str(dataPack.orgPeer) + " my id is " + str(User_Info.id))
+				#print("Got Candididate: " + str(dataPack.orgPeer) + " my id is " + str(User_Info.id))
 				rtcPeer.get_peer(dataPack.orgPeer).connection.add_ice_candidate(dataPack.mid, dataPack.index, dataPack.sdp)
 			
 		if dataPack.msg == Msg.OFFER:
@@ -156,7 +165,7 @@ func create_Rtc_Peer(id):
 	peer.session_description_created.connect(self.offerCreated.bind(id))
 	peer.ice_candidate_created.connect(self.iceCandidateCreated.bind(id))
 	rtcPeer.add_peer(peer, id)
-	print("hostId: ",hostId)
+	#print("hostId: ",hostId)
 	if id > rtcPeer.get_unique_id():
 		peer.create_offer()
 	return peer
@@ -228,7 +237,11 @@ func Send_One(data):
 func sendHost(data):
 	wsPeer.get_peer(1).put_packet(JSON.stringify(data).to_utf8_buffer())
 	
-
+@rpc("any_peer","call_local","reliable")
+func broadcast(msg):
+	$"../Msg".add_text(msg)
+	$"../Msg".newline()
+	
 func _on_room_button_down():
 	$"../Room".visible = false
 	$"../Join Room".visible = false
@@ -255,15 +268,26 @@ func _on_join_room_button_down():
 
 func _on_start_game_button_down():
 	Game.rpc()
+	# Tell server to remove roomNum in Rooms
+	var data = {
+		"msg" : Msg.START_GAME,
+		"roomRum" : User_Info["roomNum"]
+	}
+	sendHost(data)
+	
 @rpc("any_peer", "call_local")
 func Game():
 	$"..".visible = false
-	for i in Players:
-		var p_hero = load("res://Mtprtc/p_hero.tscn")
-		var hero = p_hero.instantiate()
-		hero.name = str(i)
-		add_child(hero)
-		var rnd_x = randi_range(10,20)
-		hero.global_position = Vector2(500+rnd_x,200)
+	
+	get_tree().change_scene_to_file("res://Mancala/game.tscn")
+	if Players.size() < 1:
+		return
+#	for pl in Players:
+#		var p_hero = load("res://Mtprtc/p_hero.tscn")
+#		var hero = p_hero.instantiate()
+#		hero.name = str(pl)
+#		add_child(hero)
+#		var rnd_x = randi_range(10,20)
+#		hero.global_position = Vector2(500+rnd_x,200)
 		
 

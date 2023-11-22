@@ -15,6 +15,7 @@ enum Msg{
 		ANSWER,
 		OFFER,
 		CANDIDATE,
+		START_GAME,
 		TEST
 	}
 var wsPeer := WebSocketMultiplayerPeer.new()
@@ -45,12 +46,12 @@ func _ready():
 func RTCServerConnected():
 	print("RTC server server server server server connected")
 func RTCPeerConnected(id):
-	print("server:RTCPeerConnected:",rtcPeer.get_peers())
-	print("server:RTCPeerConnected: " + str(id))
+	#print("server:RTCPeerConnected: " + str(id))
 	#wsPeer.close()
+	pass
 func RTCPeerDisconnected(id):
-	print("server: rtc peer disconnected: " , str(id))
-	print("server: rtc peer disconnected: Rooms.key",Rooms.keys())
+	#print("server: rtc peer disconnected: " , str(id))
+	#print("server: rtc peer disconnected: Rooms.key",Rooms.keys())
 	for ro in Rooms.keys():
 		for pl in Rooms[ro]["players"]:
 			print(ro," ",pl)
@@ -69,9 +70,9 @@ func _on_ws_connected(id):
 	#Send back to connected user id  
 	
 func _on_ws_disconnected(id):
-	print("WsSvr:",Peers,"Remove %d" % id)
+	#print("WsSvr:",Peers,"Remove %d" % id)
 	Peers.erase(id)
-	print("WsSvr:",Peers)
+	#print("WsSvr:",Peers)
 	
 	
 func ServerStart():
@@ -82,7 +83,8 @@ func _on_host_pressed():
 	var err = wsPeer.create_server(Server_Port)
 	if err == OK:
 		User_Info = {"id":wsPeer.get_unique_id(),"name":"WsSvr"}
-		$"../RoomNum".text = "id:" + str(User_Info.id)+"\n"
+		$"../RoomNum".text = "Server Start"+"\n"
+		$"../Msg".add_text("Waiting for clients")
 	if OS.get_name() ==  "Windows":
 		var lan_ip
 		for n in range(0, IP.get_local_interfaces().size()):
@@ -123,7 +125,7 @@ func _process(_delta):
 				"players" : Players_array
 				}
 			
-			print("Rooms:",Rooms)
+			#print("Rooms:",Rooms)
 			var data = {
 				"id" : new_hostId,
 				"msg" : Msg.ROOM_NUM,
@@ -140,7 +142,7 @@ func _process(_delta):
 			if Rooms.has(roomNum):#Check Svr Rooms
 				Rooms[roomNum]["players"].append(dataPack.id)
 				#Players.append(dataPack.id)
-				print("Rooms:",Rooms)
+				#print("Rooms:",Rooms)
 			#Send Info back to join user 
 			var data = {
 				"id": dataPack.id,
@@ -167,6 +169,11 @@ func _process(_delta):
 						"players" : Rooms[roomNum]["players"]
 					}
 					wsPeer.get_peer(dataPack.id).put_packet(JSON.stringify(data_2).to_utf8_buffer())
+		#If game room start play
+		if dataPack.msg == Msg.START_GAME:
+			if Rooms.has(dataPack.roomRum):
+				Rooms.erase(dataPack.roomRum)
+				#print("Msg.START_GAME ",Rooms)
 		#---------------------------------------------------------------------------------------------
 		if dataPack.msg == Msg.OFFER || dataPack.msg == Msg.ANSWER || dataPack.msg == Msg.CANDIDATE:
 			if User_Info.id == 1:

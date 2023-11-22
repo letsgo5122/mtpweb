@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=3 uid="uid://dr5wyf4nc5ui2"]
+
+[ext_resource type="Texture2D" uid="uid://crgbmyja74fgo" path="res://texture/background4.png" id="1_7dkfk"]
+[ext_resource type="Script" path="res://Mancala/mancala_menu.gd" id="1_wmdw2"]
+
+[node name="MancalaMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wmdw2")
+
+[node name="menubg" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(1024, 600)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_7dkfk")
+
+[node name="VB" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="P2Robot" type="Button" parent="VB"]
+layout_mode = 2
+text = "Player vs Robot"
+
+[node name="P2P" type="Button" parent="VB"]
+layout_mode = 2
+text = "Player vs Player"
+
+[node name="Quit" type="Button" parent="VB"]
+layout_mode = 2
+text = "Quit"
+
+[connection signal="pressed" from="VB/P2Robot" to="." method="_on_p_2_robot_pressed"]
+[connection signal="pressed" from="VB/P2P" to="." method="_on_p_2p_pressed"]

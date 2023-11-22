@@ -1,11 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://dbdmrdvtk8sxr"]
+[gd_scene load_steps=4 format=3 uid="uid://dbdmrdvtk8sxr"]
 
 [ext_resource type="Script" path="res://Mtprtc/Svr.gd" id="2_aad1o"]
 [ext_resource type="Texture2D" uid="uid://crgbmyja74fgo" path="res://texture/background4.png" id="2_it1lm"]
-[ext_resource type="Texture2D" uid="uid://bk5i5c0imext6" path="res://texture/card_back_128.png" id="3_f0imu"]
 [ext_resource type="Script" path="res://Mtprtc/Cli.gd" id="3_hfn3p"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_upd1x"]
 
 [node name="Net" type="Control"]
 layout_mode = 3
@@ -24,13 +21,6 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_it1lm")
 
-[node name="floor" type="StaticBody2D" parent="base"]
-position = Vector2(520, 564)
-scale = Vector2(60, 2)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="base/floor"]
-shape = SubResource("RectangleShape2D_upd1x")
-
 [node name="MenuBg" type="TextureRect" parent="."]
 custom_minimum_size = Vector2(300, 400)
 layout_mode = 1
@@ -45,7 +35,7 @@ offset_right = 150.0
 offset_bottom = 200.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("3_f0imu")
+texture = ExtResource("2_it1lm")
 expand_mode = 1
 
 [node name="Svr" type="Node" parent="MenuBg"]

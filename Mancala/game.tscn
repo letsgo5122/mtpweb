@@ -1,0 +1,108 @@
+[gd_scene load_steps=10 format=3 uid="uid://cx5he1d3ccduu"]
+
+[ext_resource type="Texture2D" uid="uid://bk5i5c0imext6" path="res://texture/card_back_128.png" id="1_c0tb4"]
+[ext_resource type="Script" path="res://Mancala/game.gd" id="1_yxn20"]
+[ext_resource type="Texture2D" uid="uid://crgbmyja74fgo" path="res://texture/background4.png" id="2_kokrb"]
+[ext_resource type="PackedScene" uid="uid://buunlqbu2avrk" path="res://Mancala/score_board.tscn" id="2_yqtoy"]
+[ext_resource type="PackedScene" uid="uid://cb40vohnex6v0" path="res://Mancala/board.tscn" id="3_x8wkq"]
+[ext_resource type="PackedScene" uid="uid://c311gfmtdbubc" path="res://Mancala/game_menu.tscn" id="6_mv6kg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3xj86"]
+albedo_color = Color(0.886275, 0.34902, 0.807843, 1)
+albedo_texture = ExtResource("2_kokrb")
+normal_scale = -1.7
+normal_texture = ExtResource("2_kokrb")
+rim = 0.58
+clearcoat = 0.42
+heightmap_texture = ExtResource("1_c0tb4")
+subsurf_scatter_strength = 0.57
+subsurf_scatter_skin_mode = true
+subsurf_scatter_texture = ExtResource("2_kokrb")
+uv1_scale = Vector3(3, 2, 1)
+uv1_triplanar_sharpness = 0.812253
+uv1_world_triplanar = true
+uv2_triplanar_sharpness = 1.03526
+billboard_keep_scale = true
+grow_amount = 8.0
+point_size = 77.5
+proximity_fade_distance = 18.55
+
+[sub_resource type="BoxMesh" id="BoxMesh_q3cvf"]
+material = SubResource("StandardMaterial3D_3xj86")
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_cibo7"]
+data = PackedVector3Array(-0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
+
+[node name="Game" type="Node3D" groups=["Diamond_g"]]
+script = ExtResource("1_yxn20")
+
+[node name="Score_board" parent="." instance=ExtResource("2_yqtoy")]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.0407072, 0.999171, 0, -0.999171, 0.0407072, 0, 8.4752, 0.580367)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Camera3D"]
+
+[node name="floor" type="Node3D" parent="."]
+
+[node name="floor5" type="MeshInstance3D" parent="floor"]
+transform = Transform3D(20, 0, 0, 0, 1, 0, 0, 0, 20, 0, 0.1, 14)
+mesh = SubResource("BoxMesh_q3cvf")
+skeleton = NodePath("")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="floor/floor5"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="floor/floor5/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_cibo7")
+
+[node name="floor4" type="MeshInstance3D" parent="floor"]
+transform = Transform3D(20, 0, 0, 0, 1, 0, 0, 0, 20, 0, 0.1, -14)
+mesh = SubResource("BoxMesh_q3cvf")
+skeleton = NodePath("")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="floor/floor4"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="floor/floor4/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_cibo7")
+
+[node name="floor3" type="MeshInstance3D" parent="floor"]
+transform = Transform3D(20, 0, 0, 0, 1, 0, 0, 0, 20, -19, 0.1, 1)
+mesh = SubResource("BoxMesh_q3cvf")
+skeleton = NodePath("")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="floor/floor3"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="floor/floor3/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_cibo7")
+
+[node name="floor2" type="MeshInstance3D" parent="floor"]
+transform = Transform3D(20, 0, 0, 0, 1, 0, 0, 0, 20, 19, 0.1, 1)
+mesh = SubResource("BoxMesh_q3cvf")
+skeleton = NodePath("")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="floor/floor2"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="floor/floor2/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_cibo7")
+
+[node name="floor" type="MeshInstance3D" parent="floor"]
+transform = Transform3D(20, 0, 0, 0, 1, 0, 0, 0, 20, 0, 0, 0)
+mesh = SubResource("BoxMesh_q3cvf")
+skeleton = NodePath("")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="floor/floor"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="floor/floor/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_cibo7")
+
+[node name="Board" parent="." instance=ExtResource("3_x8wkq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="Diamonds" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="OneSec" type="Timer" parent="."]
+
+[node name="GameMenu" parent="." instance=ExtResource("6_mv6kg")]
+
+[connection signal="timeout" from="OneSec" to="." method="_on_one_sec_timeout"]
