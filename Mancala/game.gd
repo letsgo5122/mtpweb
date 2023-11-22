@@ -72,7 +72,9 @@ func Start_Game(Current_player,limit_time_en,limit_sec):
 	bowl_click_enable(true,Current_player)
 	#Start game with Robot first
 	if !P2P and Current_player=="2":
-		Move_Diamond($Board.get_node("R4"))
+		var rndB = randi() % 5 + 1 #R1~R6(!No R0)
+		var rndBow = "R"+str(rndB)
+		Move_Diamond($Board.get_node(rndBow))
 	
 func bowl_click_enable(en,cur_player):
 	if  P2P:#Player vs Player
@@ -163,7 +165,7 @@ func Move_Diamond(bowl):
 	Change_Player()
 	
 func Check_Side_Empty():
-	#Check if any player's all bowls are empty
+	#Check if any player's side is empty
 	var B_array = []
 	var R_array = []
 	for d in $Diamonds.get_children():
