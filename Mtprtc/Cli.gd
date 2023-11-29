@@ -41,7 +41,7 @@ func _ready():
 	multiplayer.peer_disconnected.connect(RTCPeerDisconnected)
 
 func _on_connect_host_button_down():
-	var client_trusted_cas = load("res://Mtprtc/godot.crt")
+	var client_trusted_cas = load("user://Certificate/godot.crt")
 	var client_tls_options = TLSOptions.client(client_trusted_cas)
 	var err = wsPeer.create_client(Svr_addr,client_tls_options)
 	

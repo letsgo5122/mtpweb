@@ -48,8 +48,8 @@ func _ready():
 
 func _on_host_pressed():
 	# For editor test tls
-	#var server_certs = load("res://Mtprtc/godot.crt")
-	#var server_key = load("res://Mtprtc/godot.key")
+	#var server_certs = load("user://Certificate/godot.crt")
+	#var server_key = load("user://Certificate/godot.key")
 	#var server_tls_options = TLSOptions.server(server_key, server_certs)
 	#var err = wsPeer.create_server(Server_Port,"*",server_tls_options)
 	# For Docker and no tls
