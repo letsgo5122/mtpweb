@@ -1,7 +1,7 @@
 extends Node
 
 var Players = []
-var P2P = false : set = P2P_mode
+var P2P = true : set = P2P_mode
 
 var tween
 # Called when the node enters the scene tree for the first time.

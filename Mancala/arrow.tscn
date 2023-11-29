@@ -1,0 +1,69 @@
+[gd_scene load_steps=7 format=3 uid="uid://bah1coug8jpq6"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_1revv"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7joqb"]
+resource_local_to_scene = true
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_v226g"]
+points = PackedVector3Array(0.5, 0.1, 1, -0.5, 0.1, 1, 0, 0.1, -1)
+
+[sub_resource type="Animation" id="Animation_lite8"]
+resource_name = "Idle"
+length = 0.6
+loop_mode = 2
+tracks/0/type = "rotation_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Mesh")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array()
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Mesh:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(-1.5708, 0, 0), Vector3(-1.5708, 0.270526, 0), Vector3(-1.5708, -0.261799, 0), Vector3(-1.5708, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_lxtb8"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Mesh:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-1.5708, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_5k3kt"]
+_data = {
+"Idle": SubResource("Animation_lite8"),
+"RESET": SubResource("Animation_lxtb8")
+}
+
+[node name="Arrow" type="CharacterBody3D"]
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.7, 0, 0, 0, -2.53399e-06, 0.1, 0, -0.7, -3.61999e-07, 0, 0, 0)
+mesh = SubResource("PrismMesh_1revv")
+surface_material_override/0 = SubResource("StandardMaterial3D_7joqb")
+
+[node name="Col" type="CollisionShape3D" parent="."]
+shape = SubResource("ConvexPolygonShape3D_v226g")
+
+[node name="Anim" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_5k3kt")
+}

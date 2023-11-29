@@ -4,8 +4,9 @@ extends Node
 var Server_Port = 5122
 #For Client 
 var Godot_Debug = "ws://" + "127.0.0.1:5122"
-var Docker_server = "ws://" + "127.0.0.1/gd/"
-var Svr_addr = Godot_Debug
+var Docker_server = "wss://" + "127.0.0.1/gd/"
+var Digital = "wss://" + "157.230.41.93:443/gd/"
+var Svr_addr = Docker_server
 enum Msg{
 		ID,
 		NEW_ROOM,
@@ -38,10 +39,26 @@ func _ready():
 	multiplayer.connected_to_server.connect(RTCServerConnected)
 	multiplayer.peer_connected.connect(RTCPeerConnected)
 	multiplayer.peer_disconnected.connect(RTCPeerDisconnected)
+
+func _on_connect_host_button_down():
+	var client_trusted_cas = load("res://Mtprtc/godot.crt")
+	var client_tls_options = TLSOptions.client(client_trusted_cas)
+	var err = wsPeer.create_client(Svr_addr,client_tls_options)
+	
+	#var err = wsPeer.create_client(Svr_addr)
+	
+	$"../Host".visible = false
+	$"../ConnectHost".visible = false
+	#$MenuBg/Ip.text = str(userId)
+	User_Info = {"name":$"../Name".text}
+	#$MenuBg/Msg.add_text(str(userId))
+	$"../Msg".add_text($"../Name".text+" Connect Host!")
+	$"../Msg".newline()
 	
 func RTCServerConnected():
 	print("RTC server connected")
 func RTCPeerConnected(id):
+	#get_node("/root/GameManager").Players= Players
 	$"../Start Game".visible = true
 	#print("client:RTCPeerConnected",rtcPeer.get_peers())
 	#print("client:RTCPeerConnected: " + str(id))
@@ -62,37 +79,28 @@ func RTCPeerDisconnected(id):
 				tween.tween_callback(pl_leave.queue_free)
 				
 
-func ServerStart():
-	_on_host_pressed()
+#func ServerStart():
+#	_on_host_pressed()
 	
-func _on_host_pressed():
-	$"../Host".visible = false
-	var err = wsPeer.create_server(Server_Port)
-	if err == OK:
-		User_Info = {"id":wsPeer.get_unique_id(),"name":"WsSvr"}
-		$"../RoomNum".text = "id:" + str(User_Info.id)+"\n"
-	if OS.get_name() ==  "Windows":
-		var lan_ip
-		for n in range(0, IP.get_local_interfaces().size()):
-			if IP.get_local_interfaces()[n].friendly == "Wi-Fi":
-				lan_ip = JSON.stringify(IP.get_local_interfaces()[n]).split("\"")
-	#			for i in range(0,lan_ip.size()):
-	#				print(lan_ip[5])
-		$"../RoomNum".text += str(lan_ip[5])
-	#Users[User_Info.id]=User_Info
-	#print("state", Peer.get_connection_status())
-	
-func _on_connect_host_button_down():
-	$"../Host".visible = false
-	$"../ConnectHost".visible = false
-	
-	var err = wsPeer.create_client(Svr_addr)
-	#$MenuBg/Ip.text = str(userId)
-	User_Info = {"name":$"../Name".text}
-	#$MenuBg/Msg.add_text(str(userId))
-	$"../Msg".add_text($"../Name".text+" Connect Host!")
-	$"../Msg".newline()
-	
+#func _on_host_pressed():
+#	$"../Host".visible = false
+#	var err = wsPeer.create_server(Server_Port)
+#
+#	if err == OK:
+#		User_Info = {"id":wsPeer.get_unique_id(),"name":"WsSvr"}
+#		$"../RoomNum".text = "id:" + str(User_Info.id)+"\n"
+#	if OS.get_name() ==  "Windows":
+#		var lan_ip
+#		for n in range(0, IP.get_local_interfaces().size()):
+#			if IP.get_local_interfaces()[n].friendly == "Wi-Fi":
+#				lan_ip = JSON.stringify(IP.get_local_interfaces()[n]).split("\"")
+#	#			for i in range(0,lan_ip.size()):
+#	#				print(lan_ip[5])
+#		$"../RoomNum".text += str(lan_ip[5])
+#	#Users[User_Info.id]=User_Info
+#	#print("state", Peer.get_connection_status())
+#
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
 	wsPeer.poll()
@@ -108,7 +116,7 @@ func _process(_delta):
 			if ! dataPack.has("roomNum"):
 				User_Info["id"] = dataPack.id
 				Players.append(dataPack.id)
-				GameManager.Players.append(dataPack.id)
+				GameManager.Players.append(str(dataPack.id))
 				#For webrtc 
 				rtc_CreateMesh(User_Info["id"])
 			#If user joined room
@@ -214,7 +222,7 @@ func iceCandidateCreated(midName, indexName, sdpName, id):
 	wsPeer.put_packet(JSON.stringify(message).to_utf8_buffer())
 	
 func rtc_CreateMesh(id):
-	print(id," CreateMesh")
+	print("rtc_CreateMesh ",id)
 	rtcPeer.create_mesh(id)
 	multiplayer.multiplayer_peer = rtcPeer
 	

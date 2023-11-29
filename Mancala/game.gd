@@ -40,15 +40,25 @@ func _ready():
 	#Default Current_player
 	Current_player = Player_Color["Blue"]
 	
-func gameMenu(CkBt, limitTime, firstPlayer):
-	Current_player = Player_Color[firstPlayer]
+@rpc("any_peer","call_local")
+func gameMenu(CkBt, limitTime, firstPlayer, optionBtId):
+	gameMenuRpc.rpc(CkBt, limitTime, firstPlayer, optionBtId)
+	
+@rpc("any_peer","call_local")	
+func gameMenuRpc(CkBt, limitTime, firstPlayer, optionBtId):
 	#default is false
+	$GameMenu/bg/VB/CheckButton.button_pressed = CkBt
 	limit_time_en = CkBt
-	#limitTime default 20 seconds
+	
+	Current_player = Player_Color[firstPlayer]
+	$"GameMenu/bg/VB/First Player".selected = optionBtId
+	
 	limit_sec = limitTime if limit_time_en else 0
 	$Score_board/RestOfTime.text = str(limit_sec)
-	print("gameMenu Current_player ",Current_player," limit_time_en",limit_time_en," limit_sec",limit_sec)
-
+	$GameMenu/bg/VB/LimitTimeSec.text = str(limit_sec)
+	
+	#print("gameMenu Current_player ",Current_player," limit_time_en",limit_time_en," limit_sec",limit_sec)
+	
 #game_menu play button
 func Play():
 	#$GameMenu.gameMenuSetting include parameters(Current_player,limit_time_en,limit_sec)
@@ -64,7 +74,7 @@ func Start_Game(Current_player,limit_time_en,limit_sec):
 	#Clean all diamonds
 	if $Diamonds.get_child_count() > 0:
 		for d in $Diamonds.get_children():
-			d.queue_free()
+			d.free()
 	prepare_Diamond("B", 6, 4)
 	prepare_Diamond("R", 6, 4)
 	get_node(Current_player).get_node("Anim").play("Idle")
@@ -72,9 +82,9 @@ func Start_Game(Current_player,limit_time_en,limit_sec):
 	bowl_click_enable(true,Current_player)
 	#Start game with Robot first
 	if !P2P and Current_player=="2":
-		var rndB = randi() % 5 + 1 #R1~R6(!No R0)
-		var rndBow = "R"+str(rndB)
-		Move_Diamond($Board.get_node(rndBow))
+		var rnd = randi() % 5 + 1 #R1~R6(!No R0)
+		var rndBowl = "R"+str(rnd)
+		Move_Diamond($Board.get_node(rndBowl))
 	
 func bowl_click_enable(en,cur_player):
 	if  P2P:#Player vs Player
@@ -131,6 +141,8 @@ func bowl_click_enable(en,cur_player):
 
 @rpc("any_peer","call_local","reliable")
 func Move_Diamond(bowl):
+	#print("Move_Diamond","Current_player",get_node(Current_player).name,"bowl",bowl.position)
+	get_node(Current_player).position = Vector3(bowl.position.x, 1.5, get_node(Current_player).position.z )
 	if !GameOn:
 		return
 	$OneSec.stop()
@@ -290,15 +302,15 @@ func Robot_Move():
 	# find(targBowl)+1 ,need to check right side bowl contain
 	#Robot find high num bowl ,the one can moves and the last diamond can stop in target bowl
 	var CanMove = []
-	for btk in blue_target_keys:
+	for blueBowl in blue_target_keys:
 		var idx = 1 
 		var RobotWantMoveBowl = ""
 		while(RobotWantMoveBowl != "Depot_b"):
-			RobotWantMoveBowl = bowl_array[ (bowl_array.size()-2) - (bowl_array.find(btk) + idx)]
+			RobotWantMoveBowl = bowl_array[ (bowl_array.size()-2) - (bowl_array.find(blueBowl) + idx)]
 			print("RobotWantMoveBowl: ",RobotWantMoveBowl)
 			var diamondsNum =0
 			for d in $Diamonds.get_children():
-				if d.bowl_tag == RobotWantMoveBowl:
+				if d.bowl_tag == RobotWantMoveBowl and RobotWantMoveBowl != "Depot_b":
 					diamondsNum += 1
 			#Found th high bowl move 1 step to satisfied
 			if diamondsNum == idx:
@@ -317,13 +329,6 @@ func Robot_Move():
 				Move_Diamond($Board.get_node(RobotSelectBowl))
 				break
 	
-		
-				
-		
-				
-	
-	
-		
 @rpc("any_peer", "call_local", "reliable",0)
 func One_Sec_timer():
 	$"Score_board/RestOfTime".text = str(limit_sec)
@@ -401,7 +406,8 @@ func prepare_Diamond(slot_tag:String, slots:int, d:int):
 			diamond.bowl_tag = slot_node_name
 			diamond.add_to_group("Diamond_g")
 			$Diamonds.add_child(diamond)
-
+	#Reset Score
+	UpdateScore()
 
 func Rnd_pos():
 	var rnd_pos_x = randf_range(-0.3, 0.3)
@@ -416,16 +422,29 @@ func Rnd_rot(diamond):
 	
 func Puppet():
 	#print("prepare_Players ",GameManager.Players)
-	var HeroColIdx = 0
+	if has_node(str(GameManager.Players[0])) :
+		get_node(str(GameManager.Players[0])).free()
+		get_node(str(GameManager.Players[1])).free()
+		
+	var ColIdx = 0
 	for pl in GameManager.Players:
-		var p_hero = load("res://Mancala/hero.tscn")
-		hero = p_hero.instantiate()
-		hero.name = str(pl)
-		hero.get_node("Mesh").get("surface_material_override/0").albedo_color \
-			 = Color(Col[HeroColIdx])
-		add_child(hero)
-		hero.position = Vector3(7, 3, 3) if HeroColIdx==0 else Vector3(-7, 3, -3) 
-		HeroColIdx += 1
+		#var p_hero = load("res://Mancala/hero.tscn")
+		var p_arrow = load("res://Mancala/arrow.tscn")
+		var arrow = p_arrow.instantiate()
+		arrow.name = str(pl)
+		arrow.get_node("Mesh").get("surface_material_override/0").albedo_color \
+			 = Color(Col[ColIdx])
+		add_child(arrow)
+		if ColIdx != 0:
+			arrow.rotation_degrees =Vector3(0,180,0)
+		arrow.position = Vector3(6, 2, 3.7) if ColIdx==0 else Vector3(-6, 2, -3) 
+		#hero = p_hero.instantiate()
+		#hero.name = str(pl)
+		#hero.get_node("Mesh").get("surface_material_override/0").albedo_color \
+		#	 = Color(Col[ColIdx])
+		#add_child(hero)
+		#hero.position = Vector3(7, 3, 3) if ColIdx==0 else Vector3(-7, 3, -3) 
+		ColIdx += 1
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass

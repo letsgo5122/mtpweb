@@ -66,6 +66,8 @@ text = "Play"
 layout_mode = 2
 text = "Quit"
 
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+
 [connection signal="toggled" from="bg/VB/CheckButton" to="." method="_on_check_button_toggled"]
 [connection signal="text_changed" from="bg/VB/LimitTimeSec" to="." method="_on_limit_time_sec_text_changed"]
 [connection signal="item_selected" from="bg/VB/First Player" to="." method="_on_first_player_item_selected"]

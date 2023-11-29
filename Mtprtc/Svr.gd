@@ -2,10 +2,13 @@ extends Node
 
 #Server port
 var Server_Port = 5122
-#For Client 
+# For editor test tls
+#var Godot_Debug = "wss://" + "127.0.0.1:5122"
+
 var Godot_Debug = "ws://" + "127.0.0.1:5122"
-var Docker_server = "ws://" + "127.0.0.1/gd/"
-var Svr_addr = Godot_Debug
+var Docker_server = "wss://" + "127.0.0.1/gd/"
+var Digital = "wss://" + "157.230.41.93/gd/"
+#var Svr_addr = Godot_Debug
 enum Msg{
 		ID,
 		NEW_ROOM,
@@ -42,45 +45,17 @@ func _ready():
 	multiplayer.connected_to_server.connect(RTCServerConnected)
 	multiplayer.peer_connected.connect(RTCPeerConnected)
 	multiplayer.peer_disconnected.connect(RTCPeerDisconnected)
-	
-func RTCServerConnected():
-	print("RTC server server server server server connected")
-func RTCPeerConnected(id):
-	#print("server:RTCPeerConnected: " + str(id))
-	#wsPeer.close()
-	pass
-func RTCPeerDisconnected(id):
-	#print("server: rtc peer disconnected: " , str(id))
-	#print("server: rtc peer disconnected: Rooms.key",Rooms.keys())
-	for ro in Rooms.keys():
-		for pl in Rooms[ro]["players"]:
-			print(ro," ",pl)
-			if id==pl:
-				Rooms[ro]["players"].erase(id)
-	
-#Server send back to connected user id 
-func _on_ws_connected(id):
-	Peers.append(id)
-	
-	var Data = {
-		"id":id,
-		"msg":Msg.ID
-		}
-	Send_One(Data)
-	#Send back to connected user id  
-	
-func _on_ws_disconnected(id):
-	#print("WsSvr:",Peers,"Remove %d" % id)
-	Peers.erase(id)
-	#print("WsSvr:",Peers)
-	
-	
-func ServerStart():
-	_on_host_pressed()
-	
+
 func _on_host_pressed():
-	$"../Host".visible = false
+	# For editor test tls
+	#var server_certs = load("res://Mtprtc/godot.crt")
+	#var server_key = load("res://Mtprtc/godot.key")
+	#var server_tls_options = TLSOptions.server(server_key, server_certs)
+	#var err = wsPeer.create_server(Server_Port,"*",server_tls_options)
+	# For Docker and no tls
 	var err = wsPeer.create_server(Server_Port)
+	
+	$"../Host".visible = false
 	if err == OK:
 		User_Info = {"id":wsPeer.get_unique_id(),"name":"WsSvr"}
 		$"../RoomNum".text = "Server Start"+"\n"
@@ -96,16 +71,53 @@ func _on_host_pressed():
 	#Users[User_Info.id]=User_Info
 	#print("state", Peer.get_connection_status())
 	
-func _on_connect_host_button_down():
-	$"../Host".visible = false
-	$MenuBg/ConnectHost.visible = false
+#Server send back to connected user id 
+func _on_ws_connected(id):
+	Peers.append(id)
+	#print("_on_ws_connected",id)
+	var Data = {
+		"id":id,
+		"msg":Msg.ID
+		}
+	Send_One(Data)
+	#Send back to connected user id  
+		
+func RTCServerConnected():
+	print("RTC server server server server server connected")
+func RTCPeerConnected(id):
+	#print("server:RTCPeerConnected: " + str(id))
+	#wsPeer.close()
+	pass
+func RTCPeerDisconnected(id):
+	#print("server: rtc peer disconnected: " , str(id))
+	#print("server: rtc peer disconnected: Rooms.key",Rooms.keys())
+	for ro in Rooms.keys():
+		for pl in Rooms[ro]["players"]:
+			print(ro," ",pl)
+			if id==pl:
+				Rooms[ro]["players"].erase(id)
 	
-	var err = wsPeer.create_client(Svr_addr)
-	#$MenuBg/Ip.text = str(userId)
-	User_Info = {"name":$"../Name".text}
-	#$MenuBg/Msg.add_text(str(userId))
-	$"../Msg".add_text($"../Name".text+" Connect Host!")
-	$"../Msg".newline()
+
+func _on_ws_disconnected(id):
+	#print("WsSvr:",Peers,"Remove %d" % id)
+	Peers.erase(id)
+	#print("WsSvr:",Peers)
+	
+	
+func ServerStart():
+	_on_host_pressed()
+	
+
+#func _on_connect_host_button_down():
+#	$"../Host".visible = false
+#	$MenuBg/ConnectHost.visible = false
+#
+#	var err = wsPeer.create_client(Svr_addr)
+#	#$MenuBg/Ip.text = str(userId)
+#	User_Info = {"name":$"../Name".text}
+#	#$MenuBg/Msg.add_text(str(userId))
+#	$"../Msg".add_text($"../Name".text+" Connect Host!")
+#	$"../Msg".newline()
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
